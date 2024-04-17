@@ -8,17 +8,62 @@ from flask import Flask
 GUILD_ID = int(os.getenv('MY_GUILD_ID'))  # 環境変数からサーバーIDを取得
 TOKEN = os.getenv('TOKEN')  # Botのトークン
 
+app = Flask(__name__)from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
+
+class User(db.Model):
+    __tablename__ = 'users'
+
+    user_id = db.Column(db.BIGINT, primary_key=True)
+    username = db.Column(db.VARCHAR)
+    join_date = db.Column(db.DATE)
+    last_active = db.Column(db.DATE)
+
+
+class Output(db.Model):
+    __tablename__ = 'outputs'
+
+    output_id = db.Column(db.BIGINT, primary_key=True)
+    user_id = db.Column(db.BIGINT, db.ForeignKey('users.user_id'))
+    post_date = db.Column(db.DATE)
+    content = db.Column(db.TEXT)
+    validated = db.Column(db.Boolean)
+
+
+class VoiceChannelActivity(db.Model):
+    __tablename__ = 'voice_channel_activities'
+
+    activity_id = db.Column(db.BIGINT, primary_key=True)
+    user_id = db.Column(db.BIGINT, db.ForeignKey('users.user_id'))
+    enter_time = db.Column(db.TIMESTAMP)
+    exit_time = db.Column(db.TIMESTAMP)
+    duration = db.Column(db.INTEGER)
+
+
+class DailyOutputCount(db.Model):
+    __tablename__ = 'daily_output_counts'
+
+    count_id = db.Column(db.BIGINT, primary_key=True)
+    user_id = db.Column(db.BIGINT, db.ForeignKey('users.user_id'))
+    post_date = db.Column(db.DATE)
+    count = db.Column(db.INT)
+
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://username:password@localhost/db_name'
+db = SQLAlchemy(app)
 
+# Import your models here
 
-@app.route('/')
-def home():
-  return "Hello, World from Flask!"
+# Create the database tables
+db.create_all()
 
-
-def run_flask():
-  app.run(host="0.0.0.0", port=8000, debug=False)
-
+# Run the Flask app
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=8000, debug=False)
 
 class MyBot(commands.Bot):
 
