@@ -9,6 +9,7 @@ python = ">=3.10.0,<3.12"
 discord-py = "^2.3.2"
 matplotlib = "^3.8.4"
 aiohttp = "^3.9.4"
+flask = "^3.0.3"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
